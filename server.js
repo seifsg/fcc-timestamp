@@ -18,18 +18,27 @@ app.get("/", function (request, response) {
 
 
 app.get("/api/timestamp/:datestring?", function (request, response) {
+  const ds = request.params.datestring;
   let date;
 
-  if(request.params.datestring === undefined){
+  // if empty send back current date
+  if(ds === undefined){
     date = new Date();
     response.json({unix: date.getTime(), utc: date.toUTCString()}) ;
   }else{
-    date = new Date(request.params.datestring);
+    // see if its unix timestamp format  
+    const isUnix = ds.match(/^[0-9]+$/g) ? true : false;
+    // try to make a new date object with provided data
+    date = new Date(isUnix ? parseInt(ds) : ds);
+
+    // now test and send back response
     const time = date.getTime();
     if(isNaN(time)){
       response.json({error: 'Invalid Date'});  
+    }else{
+      response.json({unix: time , utc: date.toUTCString()});
     }
-    response.json({unix: time , utc: date.toUTCString()});
+
   }
 });
 
