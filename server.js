@@ -18,12 +18,23 @@ app.get("/", function (request, response) {
 
 
 app.get("/api/timestamp/:datestring?", function (request, response) {
-  let result = {unix:'',utc:''};
-  response.send(result);
+  let date;
+
+  if(request.params.datestring === undefined){
+    date = new Date();
+    response.json({unix: date.getTime(), utc: date.toUTCString()}) ;
+  }else{
+    date = new Date(request.params.datestring);
+    const time = date.getTime();
+    if(isNaN(time)){
+      response.json({error: 'Invalid Date'});  
+    }
+    response.json({unix: time , utc: date.toUTCString()});
+  }
 });
 
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT, function () {
+var listener = app.listen(3000 || process.env.PORT, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
